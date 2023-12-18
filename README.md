@@ -23,7 +23,6 @@ Usage of /selenium_grid_exporter:
   - open Dashboards -> Manage -> Selenium4 Grid monitoring
   
 ```
-  ![Screenshot](selenium4_grafana.png)
 
 ## Metrics
 
@@ -44,5 +43,7 @@ selenium_grid_hub_sessionQueueSize 0
 # TYPE selenium_grid_up gauge
 selenium_grid_up 1
 ```
+
+### Selenium Grid Exporter StartUp Guide
 
 
