@@ -3,6 +3,9 @@ package com.prometheus.selenium;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.exporter.PushGateway;
+import pl.mjaron.tinyloki.ILogStream;
+import pl.mjaron.tinyloki.LogController;
+import pl.mjaron.tinyloki.TinyLoki;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -13,6 +16,16 @@ import org.testng.ITestListener;
 import org.testng.ITestResult;
 
 public class PrometheusListeners implements ITestListener {
+
+    private LogController logController = TinyLoki
+        .withUrl("http://localhost:3100/loki/api/v1/push")
+        .start();
+
+    private ILogStream stream = logController.stream()
+        .info()
+        .l("conference", "AutomationStar")
+        .build();
+
 
     List<String> labelKeys = Arrays.asList("author");
     List<String> labelValues = Arrays.asList("gpapadakis");
@@ -52,7 +65,7 @@ public class PrometheusListeners implements ITestListener {
     public void onTestSuccess(ITestResult result) {
 
         passedTests.labels(labelValues.toArray(new String[0])).inc();
-
+        stream.log(String.format("Successful test %s", result.getName()));
         try {
             client.push(registry, jobName);
         } catch (IOException e) {
@@ -63,7 +76,7 @@ public class PrometheusListeners implements ITestListener {
     @Override
     public void onTestFailure(ITestResult result) {
         failedTests.labels(labelValues.toArray(new String[0])).inc();
-
+        stream.log(String.format("Failed test %s", result.getName()));
         try {
             client.push(registry, jobName);
         } catch (IOException e) {
@@ -74,7 +87,7 @@ public class PrometheusListeners implements ITestListener {
     @Override
     public void onTestSkipped(ITestResult result) {
         skippedTests.labels(labelValues.toArray(new String[0])).inc();
-
+        stream.log(String.format("Skipped test %s", result.getName()));
         try {
             client.push(registry, jobName);
         } catch (IOException e) {
@@ -97,6 +110,7 @@ public class PrometheusListeners implements ITestListener {
 
     @Override
     public void onFinish(ITestContext context) {
+        logController.softStop().hardStop();
     }
 
 }

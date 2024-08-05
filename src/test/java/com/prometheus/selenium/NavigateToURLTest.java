@@ -5,23 +5,48 @@ import java.net.URL;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.events.EventFiringDecorator;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
+import pl.mjaron.tinyloki.ILogStream;
+import pl.mjaron.tinyloki.LogController;
+import pl.mjaron.tinyloki.TinyLoki;
+
 @Listeners({ PrometheusListeners.class })
 public class NavigateToURLTest {
 
     private WebDriver driver;
 
+    private LogController logController = TinyLoki
+        .withUrl("http://localhost:3100/loki/api/v1/push")
+        .start();
+
+    private ILogStream stream = logController.stream()
+        .info()
+        .l("conference", "AutomationStar")
+        .build();
+
+
     @BeforeClass
     public void setUp() throws MalformedURLException {
-        FirefoxOptions chromeOptions = new FirefoxOptions();
-        this.driver = new RemoteWebDriver(new URL("http://localhost:4444"), chromeOptions);
+        ChromeOptions chromeOptions = new ChromeOptions();
+        stream.log("About to initialize firefox instance in Selenium Grid");
+        try {
+            this.driver = new RemoteWebDriver(new URL("http://localhost:4444"), chromeOptions);
+            stream.log("Chrome instance initialized");
+            WebdriverEventListener eventListener = new WebdriverEventListener();
+            EventFiringDecorator<WebDriver> decorator = new EventFiringDecorator<>(eventListener);
+            this.driver = decorator.decorate(this.driver);
+        } catch (Exception ex){
+            stream.log(String.format("Selenium Grid Issue %s!!", ex.getMessage()));
+            throw ex;
+        }
     }
 
     @Test
@@ -45,7 +70,7 @@ public class NavigateToURLTest {
     @AfterClass
     public void tearDown() {
         this.driver.close();
-
+        logController.softStop().hardStop();
     }
 
 }
