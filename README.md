@@ -226,9 +226,46 @@ We will use Gauge type of metrics to autoincrement the value within the listener
 
 Now running the tests we can actually start get metrics for the number of tests executing runtime.
 
+![tests_passed](./images/TestsPassed.png)
+
 ### (3.2) Webdriver & Loki 📁
 
 Prometheus is all about metrics but Loki is for logs. And we can start storing logs from our test projects pretty straightforward.
 
-### (3.3) Visualizing E2E testing suites 🎯
+```java
+    <dependency>
+        <groupId>io.github.mjfryc</groupId>
+        <artifactId>mjaron-tinyloki-java</artifactId>
+        <version>0.3.11</version>
+    </dependency>
+```
+
+Tiny Grafana Loki client (log sender) written in pure Java 1.8 without any external dependencies.
+
+- Implements JSON variant of Loki API
+- Works with Android and Java SE
+- Thread safe
+
+We can initialize the client to send logs to Loki 
+
+```java
+private LogController logController = TinyLoki
+        .withUrl("http://localhost:3100/loki/api/v1/push")
+        .start();
+
+private ILogStream stream = logController.stream()
+        .info()
+        .l("conference", "AutomationStar")
+        .build();
+```
+
+Now just execute the following command to push logs to Loki:
+```java
+stream.log(String message);
+```
+
+![Loki Explorer](./images/Loki_1.png)
+
+![Loki Explorer](./images/Loki_2.png)
+
 
