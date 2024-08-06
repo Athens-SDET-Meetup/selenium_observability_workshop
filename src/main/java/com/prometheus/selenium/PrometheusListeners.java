@@ -63,13 +63,12 @@ public class PrometheusListeners implements ITestListener {
 
     @Override
     public void onTestSuccess(ITestResult result) {
-
         passedTests.labels(labelValues.toArray(new String[0])).inc();
         stream.log(String.format("Successful test %s", result.getName()));
         try {
             client.push(registry, jobName);
         } catch (IOException e) {
-            e.printStackTrace();
+            stream.log(String.format("Exception pushing metrics to Pushgateway %s", e.getMessage()));
         }
     }
 
@@ -80,7 +79,7 @@ public class PrometheusListeners implements ITestListener {
         try {
             client.push(registry, jobName);
         } catch (IOException e) {
-            e.printStackTrace();
+            stream.log(String.format("Exception pushing metrics to Pushgateway %s", e.getMessage()));
         }
     }
 
@@ -91,7 +90,7 @@ public class PrometheusListeners implements ITestListener {
         try {
             client.push(registry, jobName);
         } catch (IOException e) {
-            e.printStackTrace();
+            stream.log(String.format("Exception pushing metrics to Pushgateway %s", e.getMessage()));
         }
     }
 

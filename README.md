@@ -95,8 +95,7 @@ Now open prometheus and query to fetch the data:
 The scraping config is working as expected 🥳🥳🥳!!! 
 
 Let's add some visualizations around these metrics in our Grafana instance. 
-For that we need to execute PromQL.
-
+For that we need to execute PromQL and we use also the pie chart panel.
 
 ![grafana_gateway](./images/grafana_gateway.png)
 
@@ -149,15 +148,87 @@ Now to test our integration let's bring down Selenium Grid! We hope a new Slack 
 
 ### (2.4) Dashboards 📈
 
-### (2.5) Think Time 🤔💭
+Now it's time to visualize the metrics in Grafana using some nice visualization panels. 
 
+We can use the same approach and build our own queries to enable monitoring up time of Selenium Grid.
+
+![selenium_grid_grafana](./images/selenium_grid_grafana.png)
 
 ## (3) Selenium Testing 🧪
 
+In this workshop we will run a basic set of UI tests and review how we can integrate Grafana stack to our existing functional tests
+
 ### (3.1) TestNG & Prometheus 🔎
+
+Prometheus & Pushgateway come with a java client in order to integrate it in Java Maven Project. 
+Just add the following to your project to get you started:
+
+```javascript
+     <dependency>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient</artifactId>
+        <version>0.16.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>io.prometheus</groupId>
+        <artifactId>simpleclient_pushgateway</artifactId>
+        <version>0.16.0</version>
+    </dependency>
+```
+
+First we need to think what we need to push as metrics:
+
+* **Failed Tests**
+* **Passed Tests**
+* **Skipped Tests**
+* **Total Tests**
+
+And how we can access them runtime? We will use of course TestNG listeners to listen to runtime events from the test execution. Create a Listener that extends the default TestNG one.
+
+
+```java
+public class PrometheusListeners implements ITestListener {
+  ```
+
+Now we need to initialize the metrics like the below ones:
+
+```java
+    List<String> labelKeys = Arrays.asList("author");
+    List<String> labelValues = Arrays.asList("...");
+
+    PushGateway client = new PushGateway("localhost:9091");
+    CollectorRegistry registry = CollectorRegistry.defaultRegistry;
+
+    String jobName = "selenium";
+    String passed = "TestPassed";
+
+    Gauge passedTests = Gauge.build()
+            .name(passed)
+            .help(help)
+            .labelNames(labelKeys.toArray(new String[0]))
+            .register(registry);
+  ```
+We will use Gauge type of metrics to autoincrement the value within the listener. For example we can listen to successful execution of tests and increment the value on the gauge metric.
+
+```java
+@Override
+    public void onTestSuccess(ITestResult result) {
+        passedTests.labels(labelValues.toArray(new String[0])).inc();
+        stream.log(String.format("Successful test %s", result.getName()));
+        try {
+            client.push(registry, jobName);
+        } catch (IOException e) {
+            stream.log(String.format("Exception pushing metrics to Pushgateway %s", e.getMessage()));
+        }
+    }
+```
+
+Now running the tests we can actually start get metrics for the number of tests executing runtime.
 
 ### (3.2) Webdriver & Loki 📁
 
-### (3.3) Visualizing E2E testing suites 🎯
+Prometheus is all about metrics but Loki is for logs. And we can start storing logs from our test projects pretty straightforward.
 
+### (3.3) Visualizing E2E testing suites 🎯
 
