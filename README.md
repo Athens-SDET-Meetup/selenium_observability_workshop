@@ -141,7 +141,11 @@ Follow instructions from [Slack WebHooks](https://api.slack.com/messaging/webhoo
 
 Next we need to add the token in the alertmanager.yml as well as define the channel you created to spawn alerts!
 
+![code](./images/code.png)
 
+Now to test our integration let's bring down Selenium Grid! We hope a new Slack Alert will be generated within 30 seconds!
+
+![alert](./images/alert.png)
 
 ### (2.4) Dashboards 📈
 

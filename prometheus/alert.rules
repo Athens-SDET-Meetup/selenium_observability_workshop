@@ -2,16 +2,6 @@ groups:
 - name: example
   rules:
 
-  # Alert for any instance that is unreachable for > 5 minutes.
-  - alert: ServiceDown
-    expr: up == 0
-    for: 5m
-    labels:
-      severity: page
-    annotations:
-      summary: "Instance {{ $labels.instance }} down"
-      description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
-
   - alert: SeleniumGridDown
     expr: selenium_grid_up != 1
     for: 5s
@@ -19,16 +9,16 @@ groups:
       severity: page
     annotations:
       summary: "Selenium grid down"
-      description: "Selenium grid http://uiplinfdoc040.ipswich.mgsops.net:4444/ went offline!"
+      description: "Selenium grid http://localhost:4444/ went offline!"
 
   - alert: SeleniumGridPendingSessions
-    expr: selenium_grid_hub_sessions_backlog > 0
+    expr: selenium_grid_hub_sessions > 0
     for: 5s
     labels:
       severity: page
     annotations:
       summary: "Selenium grid pending sessions detected."
-      description: "Selenium grid http://uiplinfdoc040.ipswich.mgsops.net:4444/ contains queued up sessions!"
+      description: "Selenium grid http://localhost:4444/ contains queued up sessions!"
 
   - alert: ContainerHighThrottleRate
     expr: rate(container_cpu_cfs_throttled_seconds_total[3m]) > 1
