@@ -18,8 +18,7 @@ import org.testng.annotations.Test;
 public class NavigateToURLTest {
 
     private WebDriver driver;
-
-
+    
     @BeforeClass
     public void setUp() throws MalformedURLException {
         ChromeOptions chromeOptions = new ChromeOptions();
@@ -46,8 +45,6 @@ public class NavigateToURLTest {
         this.driver.get("https://automation.eurostarsoftwaretesting.com/event/2024/monitoring-and-observability-with-selenium/?fbclid=IwY2xjawFaH4dleHRuA2FlbQIxMAABHdEkySa8JmhxW4mxhaS4EVhsS3G0f2zXfasLTi1ui7hhgzTPK8eRqZW9DQ_aem_uGfmkJLBdoM4eyI3gpmwdA");
 
         this.driver.findElement(By.cssSelector(".session_type_content a[href*=programme]")).click();
-        this.driver.findElement(By.id("password")).sendKeys("SuperSecretPassword!");
-        this.driver.findElement(By.cssSelector("[type='submit']")).click();
         Assert.assertEquals("AutomationSTAR 2024 Programme\n" + //
                         "", this.driver.findElement(By.tagName("#genesis-content .gb-container-inside h2")).getText(),
                 "Asserting header of the page");
