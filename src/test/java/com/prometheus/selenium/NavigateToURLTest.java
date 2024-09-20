@@ -14,63 +14,48 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
-import pl.mjaron.tinyloki.ILogStream;
-import pl.mjaron.tinyloki.LogController;
-import pl.mjaron.tinyloki.TinyLoki;
-
 @Listeners({ PrometheusListeners.class })
 public class NavigateToURLTest {
 
     private WebDriver driver;
 
-    private LogController logController = TinyLoki
-        .withUrl("http://localhost:3100/loki/api/v1/push")
-        .start();
-
-    private ILogStream stream = logController.stream()
-        .info()
-        .l("conference", "AutomationStar")
-        .build();
-
 
     @BeforeClass
     public void setUp() throws MalformedURLException {
         ChromeOptions chromeOptions = new ChromeOptions();
-        stream.log("About to initialize firefox instance in Selenium Grid");
         try {
             this.driver = new RemoteWebDriver(new URL("http://localhost:4444"), chromeOptions);
-            stream.log("Chrome instance initialized");
             WebdriverEventListener eventListener = new WebdriverEventListener();
             EventFiringDecorator<WebDriver> decorator = new EventFiringDecorator<>(eventListener);
             this.driver = decorator.decorate(this.driver);
         } catch (Exception ex){
-            stream.log(String.format("Selenium Grid Issue %s!!", ex.getMessage()));
             throw ex;
         }
     }
 
     @Test
     public void shouldOpenUrl() {
-        this.driver.get("https://the-internet.herokuapp.com/");
-        Assert.assertEquals("Welcome to the-internet", this.driver.findElement(By.tagName("h1")).getText(),
+        this.driver.get("https://automation.eurostarsoftwaretesting.com/event/2024/monitoring-and-observability-with-selenium/?fbclid=IwY2xjawFaH4dleHRuA2FlbQIxMAABHdEkySa8JmhxW4mxhaS4EVhsS3G0f2zXfasLTi1ui7hhgzTPK8eRqZW9DQ_aem_uGfmkJLBdoM4eyI3gpmwdA");
+        Assert.assertEquals("Monitoring and Observability with Selenium\n" + //
+                        "", this.driver.findElement(By.cssSelector("#genesis-content h1")).getText(),
                 "Asserting header of the page");
     }
 
     @Test
-    public void shouldAuthenticate() {
-        this.driver.get("https://the-internet.herokuapp.com/login");
+    public void shouldGoBackToProgramme() {
+        this.driver.get("https://automation.eurostarsoftwaretesting.com/event/2024/monitoring-and-observability-with-selenium/?fbclid=IwY2xjawFaH4dleHRuA2FlbQIxMAABHdEkySa8JmhxW4mxhaS4EVhsS3G0f2zXfasLTi1ui7hhgzTPK8eRqZW9DQ_aem_uGfmkJLBdoM4eyI3gpmwdA");
 
-        this.driver.findElement(By.id("username")).sendKeys("tomsmith");
+        this.driver.findElement(By.cssSelector(".session_type_content a[href*=programme]")).click();
         this.driver.findElement(By.id("password")).sendKeys("SuperSecretPassword!");
         this.driver.findElement(By.cssSelector("[type='submit']")).click();
-        Assert.assertEquals("Secure Area", this.driver.findElement(By.tagName("h2")).getText(),
+        Assert.assertEquals("AutomationSTAR 2024 Programme\n" + //
+                        "", this.driver.findElement(By.tagName("#genesis-content .gb-container-inside h2")).getText(),
                 "Asserting header of the page");
     }
 
     @AfterClass
     public void tearDown() {
         this.driver.close();
-        logController.softStop().hardStop();
     }
 
 }

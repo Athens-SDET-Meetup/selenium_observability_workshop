@@ -1,6 +1,6 @@
 global:
-  resolve_timeout: 1m
-  slack_api_url: 'https://hooks.slack.com/services/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'
+  resolve_timeout: 30s
+  slack_api_url: ''
 
 route:
   group_by: ['alertname']
@@ -12,5 +12,5 @@ route:
 receivers:
 - name: 'slack-notifications'
   slack_configs:
-  - channel: '#observability'
+  - channel: ''
     send_resolved: true
