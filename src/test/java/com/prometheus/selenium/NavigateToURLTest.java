@@ -34,19 +34,19 @@ public class NavigateToURLTest {
 
     @Test
     public void shouldOpenUrl() {
-        this.driver.get("https://automation.eurostarsoftwaretesting.com/event/2024/monitoring-and-observability-with-selenium/?fbclid=IwY2xjawFaH4dleHRuA2FlbQIxMAABHdEkySa8JmhxW4mxhaS4EVhsS3G0f2zXfasLTi1ui7hhgzTPK8eRqZW9DQ_aem_uGfmkJLBdoM4eyI3gpmwdA");
-        Assert.assertEquals("Monitoring and Observability with Selenium\n" + //
-                        "", this.driver.findElement(By.cssSelector("#genesis-content h1")).getText(),
+        this.driver.get("https://the-internet.herokuapp.com/");
+        Assert.assertEquals("Welcome to the-internet", this.driver.findElement(By.tagName("h1")).getText(),
                 "Asserting header of the page");
     }
 
     @Test
-    public void shouldGoBackToProgramme() {
-        this.driver.get("https://automation.eurostarsoftwaretesting.com/event/2024/monitoring-and-observability-with-selenium/?fbclid=IwY2xjawFaH4dleHRuA2FlbQIxMAABHdEkySa8JmhxW4mxhaS4EVhsS3G0f2zXfasLTi1ui7hhgzTPK8eRqZW9DQ_aem_uGfmkJLBdoM4eyI3gpmwdA");
+    public void shouldAuthenticate() {
+        this.driver.get("https://the-internet.herokuapp.com/login");
 
-        this.driver.findElement(By.cssSelector(".session_type_content a[href*=programme]")).click();
-        Assert.assertEquals("AutomationSTAR 2024 Programme\n" + //
-                        "", this.driver.findElement(By.tagName("#genesis-content .gb-container-inside h2")).getText(),
+        this.driver.findElement(By.id("username")).sendKeys("tomsmith");
+        this.driver.findElement(By.id("password")).sendKeys("SuperSecretPassword!");
+        this.driver.findElement(By.cssSelector("[type='submit']")).click();
+        Assert.assertEquals("Secure Area", this.driver.findElement(By.tagName("h2")).getText(),
                 "Asserting header of the page");
     }
 
