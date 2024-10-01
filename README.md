@@ -71,7 +71,7 @@ In this first section let us review how you can actually push metrics and scrap 
 
 First we need to define the target in prometheus.yml file like host.docker.internal instead of localhost to be able to access it as its running within a docker container.
 
-```javascript
+```xml
   - job_name: 'Pushgateway'
     honor_labels: true
     static_configs:
@@ -106,6 +106,18 @@ In this section we will deep dive into the implementation of the Selenium Grid E
 The architecture is the following:
 
 ![grid_exporter](./images/grid_exporter.png)
+
+For prometheus we need to add the settings for scrape selenium grid metrics:
+
+```xml
+- job_name: 'selenium'
+
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+
+    static_configs:
+         - targets: ['selenium_grid_exporter:8080']
+```
 
 The metrics exposed from Selenium Grid Exporter:
 
@@ -145,6 +157,22 @@ Next we need to add the token in the alertmanager.yml as well as define the chan
 Now to test our integration let's bring down Selenium Grid! We hope a new Slack Alert will be generated within 30 seconds!
 
 ![alert](./images/alert.png)
+
+For the above just set the code
+```xml
+groups:
+- name: example
+  rules:
+
+  - alert: SeleniumGridDown
+    expr: selenium_grid_up != 1
+    for: 5s
+    labels:
+      severity: page
+    annotations:
+      summary: "Selenium grid down"
+      description: "Selenium grid http://localhost:4444/ went offline!"
+```
 
 ### (2.4) Dashboards 📈
 
