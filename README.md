@@ -222,17 +222,42 @@ public class PrometheusListeners implements ITestListener {
 Now we need to initialize the metrics like the below ones:
 
 ```java
+    private LogController logController = TinyLoki
+        .withUrl("http://localhost:3100/loki/api/v1/push")
+        .start();
+
+    private ILogStream stream = logController.stream()
+        .info()
+        .l("conference", "AutomationStar")
+        .build();
+
+
     List<String> labelKeys = Arrays.asList("author");
-    List<String> labelValues = Arrays.asList("...");
+    List<String> labelValues = Arrays.asList("gpapadakis");
 
     PushGateway client = new PushGateway("localhost:9091");
     CollectorRegistry registry = CollectorRegistry.defaultRegistry;
 
-    String jobName = "selenium";
+    String jobName = "automationstar";
     String passed = "TestPassed";
+    String failed = "TestFailed";
+    String skipped = "TestSkipped";
+    String help = "metric_help";
 
     Gauge passedTests = Gauge.build()
             .name(passed)
+            .help(help)
+            .labelNames(labelKeys.toArray(new String[0]))
+            .register(registry);
+
+    Gauge failedTests = Gauge.build()
+            .name(failed)
+            .help(help)
+            .labelNames(labelKeys.toArray(new String[0]))
+            .register(registry);
+
+    Gauge skippedTests = Gauge.build()
+            .name(skipped)
             .help(help)
             .labelNames(labelKeys.toArray(new String[0]))
             .register(registry);
